@@ -59,7 +59,7 @@ def show_menu():
         "1. List all products in store\n"
         "2. Show total amount in store\n"
         "3. Make an order\n"
-        "4. Quit"
+        "4. Quit\n"
     )
 
 
@@ -75,10 +75,12 @@ def list_products(store):
         print(f"{index}. ", end="")
         product.show()
 
+    print()
+
 
 def show_total_quantity(store):
     """Display the total quantity of products in the store."""
-    print(f"Total amount of products: {store.get_total_quantity()}")
+    print(f"Total amount of products: {store.get_total_quantity()}\n")
 
 
 def get_orderable_products(store, shopping_list):
@@ -112,11 +114,11 @@ def add_product_to_order(available_products, shopping_list):
 
     available_quantity = get_available_quantity(product, shopping_list)
 
-    quantity = get_choice("Please enter the quantity: ", 1, available_quantity)
+    quantity = get_choice("\nPlease enter the quantity: ", 1, available_quantity)
 
     shopping_list.append((product, quantity))
 
-    print(f"{quantity} {product.name} added to the shopping list.")
+    print(f"\n{quantity} {product.name} added to the shopping list.\n")
 
 
 def make_order(store):
@@ -140,7 +142,7 @@ def make_order(store):
     if shopping_list:
         try:
             total = store.order(shopping_list)
-            print(f"Total price: ${total}")
+            print(f"\nTotal price: ${total}\n")
         except ValueError as error:
             print(f"Order could not be completed: {error}")
 
