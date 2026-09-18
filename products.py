@@ -17,11 +17,9 @@ class Product:
         self.quantity = quantity
         self.active = quantity > 0
 
-
     def get_quantity(self):
         """Return the current quantity in stock."""
         return self.quantity
-
 
     def set_quantity(self, quantity):
         """Set the product quantity and deactivate it if sold out."""
@@ -33,26 +31,21 @@ class Product:
         if self.quantity == 0:
             self.deactivate()
 
-
     def is_active(self):
         """Return True if the product is available for purchase."""
         return self.active
-
 
     def activate(self):
         """Activate the product."""
         self.active = True
 
-
     def deactivate(self):
         """Deactivate the product."""
         self.active = False
 
-
     def show(self):
         """Print the product's information."""
         print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}")
-
 
     def buy(self, quantity):
         """Purchase a quantity of the product and return the total price."""

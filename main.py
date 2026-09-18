@@ -3,10 +3,11 @@ import store
 
 
 # setup initial stock of inventory
-product_list = [ products.Product("MacBook Air M2", price=1450, quantity=100),
-                 products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                 products.Product("Google Pixel 7", price=500, quantity=250)
-               ]
+product_list = [
+    products.Product("MacBook Air M2", price=1450, quantity=100),
+    products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
+    products.Product("Google Pixel 7", price=500, quantity=250),
+]
 best_buy = store.Store(product_list)
 
 
@@ -27,21 +28,7 @@ def get_choice(message, minimum, maximum):
         if minimum <= choice <= maximum:
             return choice
 
-        print(
-            f"Please enter a number between "
-            f"{minimum} and {maximum}."
-        )
-
-
-def get_positive_integer(message):
-    """Ask the user for a positive integer."""
-    while True:
-        value = get_integer(message)
-
-        if value > 0:
-            return value
-
-        print("Please enter a positive number.")
+        print(f"Please enter a number between {minimum} and {maximum}.")
 
 
 def get_yes_no(message):
@@ -69,11 +56,11 @@ def get_available_quantity(product, shopping_list):
 def show_menu():
     """Display the store's main menu."""
     print(
-            "1. List all products in store\n"
-            "2. Show total amount in store\n"
-            "3. Make an order\n"
-            "4. Quit"
-        )
+        "1. List all products in store\n"
+        "2. Show total amount in store\n"
+        "3. Make an order\n"
+        "4. Quit"
+    )
 
 
 def list_products(store):
@@ -81,8 +68,7 @@ def list_products(store):
     available_products = store.get_all_products()
 
     if not available_products:
-        print("I am sorry to say, there are no products available.\n"
-              "The store is sold out.")
+        print("There are no products currently available.\nThe store is sold out.")
         return
 
     for index, product in enumerate(available_products, start=1):
@@ -92,8 +78,45 @@ def list_products(store):
 
 def show_total_quantity(store):
     """Display the total quantity of products in the store."""
-    print(
-        f"Total amount of products: {store.get_total_quantity()}")
+    print(f"Total amount of products: {store.get_total_quantity()}")
+
+
+def get_orderable_products(store, shopping_list):
+    """Return products still available for the current order."""
+    return [
+        product
+        for product in store.get_all_products()
+        if get_available_quantity(product, shopping_list) > 0
+    ]
+
+
+def add_product_to_order(available_products, shopping_list):
+    """Ask the user to select a product and quantity."""
+    print("\nAvailable products:")
+
+    for index, product in enumerate(available_products, start=1):
+        available_quantity = get_available_quantity(product, shopping_list)
+
+        print(
+            f"{index}. "
+            f"{product.name}, "
+            f"Price: {product.price}, "
+            f"Quantity: {available_quantity}"
+        )
+
+    product_choice = get_choice(
+        "Please enter the product number: ", 1, len(available_products)
+    )
+
+    product = available_products[product_choice - 1]
+
+    available_quantity = get_available_quantity(product, shopping_list)
+
+    quantity = get_choice("Please enter the quantity: ", 1, available_quantity)
+
+    shopping_list.append((product, quantity))
+
+    print(f"{quantity} {product.name} added to the shopping list.")
 
 
 def make_order(store):
@@ -101,52 +124,15 @@ def make_order(store):
     shopping_list = []
 
     while True:
-        available_products = [product for product in store.get_all_products()
-            if get_available_quantity(product, shopping_list) > 0
-        ]
+        available_products = get_orderable_products(store, shopping_list)
 
         if not available_products:
             print("There are no more products available to add.")
             break
 
-        print("\nAvailable products:")
+        add_product_to_order(available_products, shopping_list)
 
-        for index, product in enumerate(available_products, start=1):
-            available_quantity = get_available_quantity(product, shopping_list)
-
-            print(
-                f"{index}. "
-                f"{product.name}, "
-                f"Price: {product.price}, "
-                f"Quantity: {available_quantity}"
-            )
-
-        product_choice = get_choice(
-            "Please enter the product number: ",
-            1,
-            len(available_products)
-        )
-
-        product = available_products[product_choice - 1]
-
-        available_quantity = get_available_quantity(product, shopping_list)
-
-        quantity = get_choice(
-            "Please enter the quantity: ",
-            1,
-            available_quantity
-        )
-
-        shopping_list.append((product, quantity))
-
-        print(
-            f"{quantity} {product.name} "
-            f"added to the shopping list."
-        )
-
-        another = get_yes_no(
-            "Would you like to add another product? (y/n): "
-        )
+        another = get_yes_no("Would you like to add another product? (y/n): ")
 
         if another == "n":
             break
@@ -170,11 +156,7 @@ def start(store):
     while True:
         show_menu()
 
-        choice = get_choice(
-            "Please choose an option: ",
-            1,
-            4
-        )
+        choice = get_choice("Please choose an option: ", 1, 4)
 
         if choice == 4:
             print("Goodbye!")
