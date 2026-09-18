@@ -139,6 +139,12 @@ def make_order(store):
 
 def start(store):
     """Run the store's main menu."""
+    actions = {
+        1: lambda: list_products(store),
+        2: lambda: show_total_quantity(store),
+        3: lambda: make_order(store),
+    }
+
     while True:
         show_menu()
 
@@ -148,20 +154,11 @@ def start(store):
             4
         )
 
-        if choice == 1:
-            list_products(store)
-
-        elif choice == 2:
-            show_total_quantity(store)
-
-        elif choice == 3:
-            make_order(store)
-
-        elif choice == 4:
+        if choice == 4:
             print("Goodbye!")
             break
 
-    start(best_buy)
+        actions[choice]()
 
 
 start(best_buy)
