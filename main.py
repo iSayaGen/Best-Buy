@@ -55,6 +55,17 @@ def get_yes_no(message):
         print("Please enter y or n.")
 
 
+def get_available_quantity(product, shopping_list):
+    """Return the quantity available after accounting for the cart."""
+    ordered_quantity = sum(
+        quantity
+        for ordered_product, quantity in shopping_list
+        if ordered_product == product
+    )
+
+    return product.get_quantity() - ordered_quantity
+
+
 def show_menu():
     """Display the store's main menu."""
     print(
@@ -90,17 +101,25 @@ def make_order(store):
     shopping_list = []
 
     while True:
-        available_products = store.get_all_products()
+        available_products = [product for product in store.get_all_products()
+            if get_available_quantity(product, shopping_list) > 0
+        ]
 
         if not available_products:
-            print("There are no products available to order.")
-            return
+            print("There are no more products available to add.")
+            break
 
         print("\nAvailable products:")
 
         for index, product in enumerate(available_products, start=1):
-            print(f"{index}. ", end="")
-            product.show()
+            available_quantity = get_available_quantity(product, shopping_list)
+
+            print(
+                f"{index}. "
+                f"{product.name}, "
+                f"Price: {product.price}, "
+                f"Quantity: {available_quantity}"
+            )
 
         product_choice = get_choice(
             "Please enter the product number: ",
@@ -110,10 +129,12 @@ def make_order(store):
 
         product = available_products[product_choice - 1]
 
+        available_quantity = get_available_quantity(product, shopping_list)
+
         quantity = get_choice(
             "Please enter the quantity: ",
             1,
-            product.get_quantity()
+            available_quantity
         )
 
         shopping_list.append((product, quantity))
@@ -130,11 +151,12 @@ def make_order(store):
         if another == "n":
             break
 
-    try:
-        total = store.order(shopping_list)
-        print(f"Total price: ${total}")
-    except ValueError as error:
-        print(f"Order could not be completed: {error}")
+    if shopping_list:
+        try:
+            total = store.order(shopping_list)
+            print(f"Total price: ${total}")
+        except ValueError as error:
+            print(f"Order could not be completed: {error}")
 
 
 def start(store):
